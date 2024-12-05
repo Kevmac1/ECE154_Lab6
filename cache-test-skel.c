@@ -1,22 +1,22 @@
 /*
-YOUR NAME HERE
+Kevin_Mazariegos_Diego_Mateos
 ECE 154A - Fall 2012
 Lab 2 - Mystery Caches
 Due: 12/3/12, 11:00 pm
 
 Mystery Cache Geometries:
 mystery0:
-    block size = 
-    cache size = 
-    associativity = 
+    block size = 64 bytes
+    cache size = 4194304 bytes
+    associativity = 16
 mystery1:
-    block size = 
-    cache size = 
-    associativity = 
+    block size = 4 bytes
+    cache size = 4096 bytes
+    associativity = 1
 mystery2:
-    block size = 
-    cache size = 
-    associativity = 
+    block size = 32 bytes
+    cache size = 4218 bytes
+    associativity = 128
 */
 
 #include <stdlib.h>
@@ -27,45 +27,75 @@ mystery2:
    Returns the size (in bytes) of the cache
 */
 int get_cache_size(int block_size) {
-    // The cache size is typically determined by the number of blocks, 
-    // associativity, and block size. You may need to test access patterns.
-    int size = 0;
-    
-    // Try allocating a buffer and incrementally increase its size until you hit a significant 
-    // number of cache misses (indicating cache overflow).
-    // For simplicity, we assume a 64KB cache (this will need adjustment based on testing).
-    
-    // Use the cache size formula: cache size = num_sets * associativity * block_size
-    // For now, we assume 64KB cache as an example
-    size = 64 * 1024;  // This is just a placeholder
-    
-    return size;
+   int access = 0; // var to track
+
+ int exitBlock = block_size; // tracks boundary for next block size
+ int numBlocks = 1; // tracks cache blocks
+
+
+flush_cache();
+ access_cache(0);
+    //loop until cache misses
+ while (access_cache(0)) {
+ access = block_size;
+ while (access <= exitBlock) {
+ access += block_size; 
+ access_cache(access);
+
+}
+
+ exitBlock += block_size; // move to next boundary
+ numBlocks++;
+
+
+}
+
+
+ //
+return (numBlocks * block_size);
 }
 
 /*
    Returns the associativity of the cache
 */
 int get_cache_assoc(int size) {
-    int assoc = 0;
-    
-    // Associativity can be inferred by observing cache behavior.
-    // One way to infer it is by using varying access patterns.
-    // For now, we assume a 2-way associative cache (adjust after experimentation).
-    assoc = 2;  // Placeholder, you will adjust based on testing.
-    
-    return assoc;
+   flush_cache();
+ access_cache(0);
+
+
+ int block_size = size; // assume block size = cache size
+ int access = 0; //tracks address
+ int exitBlock = 1;
+ int associativity = 0;
+
+//loop until cache miss
+ while (access_cache(0)) {
+
+ associativity = 0;
+ access = block_size;
+// checks for boundary of the associativity level
+ while ((access == exitBlock) || (access < exitBlock)) {
+ associativity++;
+ access += block_size;
+ access_cache(access);
+ }
+
+ exitBlock += block_size;
+ }
+
+ return associativity;
 }
 
 /*
    Returns the size (in bytes) of each block in the cache.
 */
 int get_block_size() {
-    // To determine block size, you will test with different block sizes and observe
-    // the change in cache behavior. A typical block size is between 16 and 64 bytes.
-    int block_size = 16;  // Placeholder, will adjust based on tests.
-    
-    // For example, test different block sizes (e.g., 16B, 32B, 64B) and track cache misses
-    // to infer the correct block size.
+   int access = 0;
+    int block_size = 0;
+    access_cache(0);
+    while(access_cache(access)) {
+        access+=1;
+        block_size++;
     
     return block_size;
 }
